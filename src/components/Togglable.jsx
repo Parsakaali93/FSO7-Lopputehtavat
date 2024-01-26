@@ -1,4 +1,4 @@
-import { useState, useImperativeHandle, forwardRef  } from 'react'
+import { useState, useImperativeHandle, forwardRef } from 'react'
 import PropTypes from 'prop-types'
 
 /* Komponentin luova funktio on kääritty funktiokutsun forwardRef sisälle,
