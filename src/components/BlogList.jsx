@@ -3,39 +3,46 @@ import { useState, useEffect, useRef } from 'react'
 import Togglable from './Togglable.jsx'
 import AddBlogForm from './AddBlogForm.jsx'
 import Blog from './Blog.jsx'
-
+import { useDispatch, useSelector } from "react-redux"
+import { addBlog, setBlogs, changeBlog, removeBlog } from '../reducers/blogReducer.js'
+import { showNotification } from '../reducers/notificationReducer.js'
 const BlogList = ({loggedInUser}) => {
-    const [blogs, setBlogs] = useState([])
+    //const [blogs, setBlogs] = useState([])
+    const blogs = [...useSelector(state => state.blogs)]
+
     const addBlogFormRef = useRef()
+    const dispatch = useDispatch()
 
-      useEffect(() => {
-        const config = { headers: { Authorization: blogService.token }, }
-        console.log(config)
-    
-        if(blogService.token){
-          blogService.getAllForUser(config).then(blogs =>
-            setBlogs(blogs)
-          )}
-      }, [blogService.token])
+    useEffect(() => {
+      const config = { headers: { Authorization: blogService.token }, }
+      //console.log(config)
+  
+      if(blogService.token){
+        blogService.getAllForUser(config).then(blogs =>
+          {
+          dispatch(setBlogs(blogs))}
+        )}},
+     [blogService.token])
 
-        const updateBlog = async(blog) =>
-        {
-        try{
-            const updatedBlog = await blogService.updateBlog(blog)
-            console.log('Updated blog: ', updatedBlog)
-            setBlogs(oldBlogs => oldBlogs.map(oldBlog =>
-            oldBlog.id === updatedBlog.id ? updatedBlog : oldBlog
-            ))
-        }
-    
-        catch(exception){
-            console.log(exception)
-        }
-        }
+
+      const updateBlog = async(blog) => {
+      try{
+          const updatedBlog = await blogService.updateBlog(blog)
+          dispatch(changeBlog(updatedBlog))
+          dispatch(showNotification(`Voted for ${updatedBlog.title}`, "purple", 3))
+          // setBlogs(oldBlogs => oldBlogs.map(oldBlog =>
+          // oldBlog.id === updatedBlog.id ? updatedBlog : oldBlog
+          // ))
+      }
+  
+      catch(exception){
+          console.log(exception)
+      }}
 
     const deleteBlog = async (id) => {
         try{
-          const response = blogService.deleteBlog(id)
+          const response = await blogService.deleteBlog(id)
+          dispatch(removeBlog(id))
           //showNotification("red", "Successfully deleted blog")
           dispatch(showNotification("Successfully deleted blog", "purple", 3))
         }
@@ -43,9 +50,9 @@ const BlogList = ({loggedInUser}) => {
         catch{
 
         }
-    
-        setBlogs(oldBlogs => oldBlogs.filter(oldBlog => oldBlog.id !== id))
 
+        
+        //setBlogs(oldBlogs => oldBlogs.filter(oldBlog => oldBlog.id !== id))
       }
 
       const submitBlog = async (blog) => {
@@ -56,7 +63,10 @@ const BlogList = ({loggedInUser}) => {
         try{
           const response = await blogService.addBlogService(config, blog)
           
-          setBlogs((oldBlogs) => [...oldBlogs, response])
+          dispatch(addBlog(response))
+          //setBlogs((oldBlogs) => [...oldBlogs, response])
+
+
           //showNotification("green", `Successfully added blog ${response.title} by ${response.author}`)
           addBlogFormRef.current.toggleVisibility()
         }

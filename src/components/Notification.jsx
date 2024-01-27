@@ -4,11 +4,9 @@ import { useDispatch, useSelector } from "react-redux"
 const Notification = () => {
     //const [errorVisible, setErrorVisible] = useState(isVisible)
 
-    useSelector(state => console.log(state))
     const notification = useSelector(state => state.notification.text)
     const color = useSelector(state => state.notification.color)
     const visible = useSelector(state => state.notification.display)
-
 
     const errorElement = () => {
         return(

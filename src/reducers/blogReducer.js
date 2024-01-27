@@ -1,25 +1,45 @@
 import { createSlice } from "@reduxjs/toolkit"
 
 const blogSlice = createSlice({
-  name: 'blog',
-  initialState: {text: 'Initial Notification', display: false},
+  name: 'blogs',
+  initialState: [],
      reducers:{
-      setNotificiation(state, action){
+      addBlog(state, action){
         console.log(action.payload)
+        return [...state, action.payload]
+      },
+
+      setBlogs(state, action){
+        console.log("setBlogs", action.payload)
         return action.payload
+      },
+
+      changeBlog(state, action){
+        const updatedBlog = action.payload;
+
+        return state.map(blog =>
+          blog.id === updatedBlog.id ? updatedBlog : blog
+        )
+      },
+
+      removeBlog(state, action) {
+        const blogIdToDelete = action.payload;
+  
+        // Create a new array that excludes the blog to be deleted
+        return state.filter(blog => blog.id !== blogIdToDelete);
       },
     }
 })
 
-export const showNotification = (text, color, time) => {
-  return async dispatch => {
-     dispatch(setNotificiation({text: text, color: color, display: true}))
+// export const showNotification = (text, color, time) => {
+//   return async dispatch => {
+//      dispatch(setNotificiation({text: text, color: color, display: true}))
      
-     setTimeout(() => {
-      dispatch(setNotificiation({text: text, color: color, display: false}))
-    }, time * 1000)
- }
-}
+//      setTimeout(() => {
+//       dispatch(setNotificiation({text: text, color: color, display: false}))
+//     }, time * 1000)
+//  }
+// }
 
-  export const { setNotificiation, clearNotification } = notificationSlice.actions
-  export default notificationSlice.reducer
+  export const { addBlog, setBlogs, changeBlog, removeBlog } = blogSlice.actions
+  export default blogSlice.reducer
