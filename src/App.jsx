@@ -1,28 +1,17 @@
 import { useState, useEffect, useRef } from 'react'
-import Blog from './components/Blog'
 import blogService from './services/blogs'
 import { formToJSON } from 'axios'
 import axios from 'axios'
-import AddBlogForm from './components/AddBlogForm'
-import Togglable from './components/Togglable'
 import Notification from './components/Notification'
-import { useDispatch } from 'react-redux'
-import { showNotification } from './reducers/notificationReducer'
+import { useDispatch, useSelector } from 'react-redux'
 import BlogList from './components/BlogList'
+import { setUser } from './reducers/loginReducer'
 
 const App = () => {
   const setToken = newToken => { blogService.token = `Bearer ${newToken}` }
+  const dispatch = useDispatch()
 
-  useEffect(() => {
-      const loggedUserJSON = window.localStorage.getItem('loggedInUser')
-      if (loggedUserJSON) {
-        const user = JSON.parse(loggedUserJSON)
-        setLoggedInUser(user)
-        setToken(user.token)
-        console.log(user.token)}
-    }, [])
-
-  const [loggedInUser, setLoggedInUser] = useState(null)
+  const loggedInUser = useSelector(state => state.login)
   const [username, setUsername] = useState([])
   const [password, setPassword] = useState([])
 
@@ -30,23 +19,32 @@ const App = () => {
   const [notificationColor, setNotificationColor] = useState('red');
   const [notificationMessage, setNotificationMessage] = useState('An error has occurred');
 
-  const dispatch = useDispatch()
+
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem('loggedInUser')
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON)
+      console.log("user localstorage", user)
+      //setLoggedInUser(user)
+      dispatch(setUser(user))
+      console.log(user)
+      setToken(user.token)
+      }
+  }, [])
 
   // Test user: Maukkis hunter3
   const handleLogin = async (event) => {
     event.preventDefault()
 
     try{
-      console.log('logging in with', username, password)
-      const response = await axios.post('/api/login', { username, password })
-      setLoggedInUser(response.data)
-      setUsername('')
-      setPassword('')
-      window.localStorage.setItem('loggedInUser', JSON.stringify(response.data))
+        console.log('logging in with', username, password)
+        const response = await axios.post('/api/login', { username, password })
+        dispatch(setUser(response.data))
+        setUsername('')
+        setPassword('')
+        window.localStorage.setItem('loggedInUser', JSON.stringify(response.data))
 
-      console.log(response.data)
-      console.log(loggedInUser)
-      setToken(response.data.token)
+        setToken(response.data.token)
     }
 
     catch(exception){
@@ -60,7 +58,7 @@ const App = () => {
 
   const logout = () => {
     window.localStorage.clear()
-    setLoggedInUser(null)
+    dispatch(setUser(null))
     setToken(null)
   }
 
@@ -91,7 +89,6 @@ const App = () => {
       {loggedInUser && loggedInForm()}
       <button onClick={test}>TEST</button>
       <Notification isVisible={notificationVisible} color={notificationColor} message={notificationMessage}/>
-
 
       <h2>blogs</h2>
       <BlogList loggedInUser={loggedInUser}/>

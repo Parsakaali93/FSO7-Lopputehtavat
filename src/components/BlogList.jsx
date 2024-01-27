@@ -18,11 +18,10 @@ const BlogList = ({loggedInUser}) => {
       //console.log(config)
   
       if(blogService.token){
-        blogService.getAllForUser(config).then(blogs =>
-          {
-          dispatch(setBlogs(blogs))}
-        )}},
-     [blogService.token])
+        blogService.getAllForUser(config).then(blogs => {
+          dispatch(setBlogs(blogs))
+        }
+      )}},  [blogService.token])
 
 
       const updateBlog = async(blog) => {
