@@ -61,7 +61,7 @@ const BlogList = ({loggedInUser}) => {
       const submitBlog = async (blog) => {
 
         //console.log(`Adding blog ${JSON.stringify(blog)} for user ${JSON.stringify(config)}`)
-        const config = { headers: { Authorization: blogService.token }, }
+        const config = { headers: { Authorization: blogService.getToken() }, }
     
         try{
           const response = await blogService.addBlogService(config, blog)

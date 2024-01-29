@@ -7,6 +7,16 @@ const getAll = () => {
   return request.then(response => response.data)
 }
 
+const getToken = () => {
+  return token
+}
+
+const setToken = newToken => {
+  console.log("setting token to", newToken)
+  token = `Bearer ${newToken}` 
+  console.log("token changed to", token)
+}
+
 const getAllForUser = (user) => {
   console.log("getAllForUser", user)
   const request = axios.get(baseUrl, user)
@@ -35,4 +45,4 @@ const updateBlog = (blog) => {
   return request.then(response => response.data)
 }
 
-export default { getAll, getAllForUser, addBlogService, deleteBlog, updateBlog }
+export default { getAll, getAllForUser, addBlogService, deleteBlog, updateBlog, getToken, setToken }

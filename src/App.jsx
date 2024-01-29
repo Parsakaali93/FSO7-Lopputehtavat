@@ -12,6 +12,8 @@ import {
   BrowserRouter as Router,  Routes, Route, Link
 } from 'react-router-dom'
 import Users from './components/Users'
+import SingleUserPage from './components/SingleUserPage'
+import blogs from './services/blogs'
 
 const App = () => {
   const dispatch = useDispatch()
@@ -24,6 +26,7 @@ const App = () => {
   const [notificationColor, setNotificationColor] = useState('red');
   const [notificationMessage, setNotificationMessage] = useState('An error has occurred');
 
+  const [users, setUsers] = useState([])
 
   console.log("App render")
   useEffect(() => {
@@ -35,8 +38,35 @@ const App = () => {
       dispatch(setUser(user))
       console.log("token from localstorage", user.token)
       usersService.setToken(user.token)
+      blogService.setToken(user.token)
       }
   }, [])
+
+// Fetch all users
+  useEffect(() => {
+    const fetchAllUsers = async () => {
+        try {
+
+          const allUsers = await usersService.getAllUsers()
+          console.log("au", allUsers, allUsers.length)
+        //   for(let i = 0; i < allUsers.length; i++)
+        //   {
+        //     //const b = await usersService.getAllOfUsersBlogs(allUsers[0].id)
+        //    // allUsers[i] = {...allUsers[i], blogs: b.length}
+        //   }
+
+          setUsers(allUsers);
+
+        } catch (error) {
+          // Handle error if needed
+          console.error('Error fetching users:', error);
+        }
+      }
+
+      fetchAllUsers();
+  }, [])
+
+
 
   // Test user: Maukkis hunter3
   const handleLogin = async (event) => {
@@ -53,6 +83,7 @@ const App = () => {
         console.log("token from login", response.data.token)
 
         usersService.setToken(response.data.token)
+        blogService.setToken(response.data.token)
     }
 
     catch(exception){
@@ -99,12 +130,12 @@ const App = () => {
     <div>
       <Link style={padding} to="/">blogs</Link>
       <Link style={padding} to="/users">users</Link>
-
+      {!loggedInUser && loginForm()}
+      {loggedInUser && loggedInForm()}
     <Routes>
       <Route path="/" element={
         <div>
-          {!loggedInUser && loginForm()}
-          {loggedInUser && loggedInForm()}
+          
           
           <button onClick={test}>TEST</button>
           
@@ -115,7 +146,8 @@ const App = () => {
         </div>
       }/>
 
-      <Route path="/users" element={<Users />} />
+      <Route path="/users" element={<Users users={users}/>} />
+      <Route path="/users/:id" element={<SingleUserPage users={users}/>} />
     </Routes>
     </div>
   )
