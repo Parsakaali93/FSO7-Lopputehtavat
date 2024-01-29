@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import blogService from './services/blogs'
+import usersService from './services/users'
 import { formToJSON } from 'axios'
 import axios from 'axios'
 import Notification from './components/Notification'
@@ -7,8 +8,12 @@ import { useDispatch, useSelector } from 'react-redux'
 import BlogList from './components/BlogList'
 import { setUser } from './reducers/loginReducer'
 
+import {
+  BrowserRouter as Router,  Routes, Route, Link
+} from 'react-router-dom'
+import Users from './components/Users'
+
 const App = () => {
-  const setToken = newToken => { blogService.token = `Bearer ${newToken}` }
   const dispatch = useDispatch()
 
   const loggedInUser = useSelector(state => state.login)
@@ -20,6 +25,7 @@ const App = () => {
   const [notificationMessage, setNotificationMessage] = useState('An error has occurred');
 
 
+  console.log("App render")
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedInUser')
     if (loggedUserJSON) {
@@ -27,8 +33,8 @@ const App = () => {
       console.log("user localstorage", user)
       //setLoggedInUser(user)
       dispatch(setUser(user))
-      console.log(user)
-      setToken(user.token)
+      console.log("token from localstorage", user.token)
+      usersService.setToken(user.token)
       }
   }, [])
 
@@ -44,7 +50,9 @@ const App = () => {
         setPassword('')
         window.localStorage.setItem('loggedInUser', JSON.stringify(response.data))
 
-        setToken(response.data.token)
+        console.log("token from login", response.data.token)
+
+        usersService.setToken(response.data.token)
     }
 
     catch(exception){
@@ -83,15 +91,32 @@ const App = () => {
     </div>
   )
 
+  const padding = {
+    padding: 5
+  }
+
   return (
     <div>
-      {!loggedInUser && loginForm()}
-      {loggedInUser && loggedInForm()}
-      <button onClick={test}>TEST</button>
-      <Notification isVisible={notificationVisible} color={notificationColor} message={notificationMessage}/>
+      <Link style={padding} to="/">blogs</Link>
+      <Link style={padding} to="/users">users</Link>
 
-      <h2>blogs</h2>
-      <BlogList loggedInUser={loggedInUser}/>
+    <Routes>
+      <Route path="/" element={
+        <div>
+          {!loggedInUser && loginForm()}
+          {loggedInUser && loggedInForm()}
+          
+          <button onClick={test}>TEST</button>
+          
+          <Notification isVisible={notificationVisible} color={notificationColor} message={notificationMessage}/>
+          
+          <h2>blogs</h2>
+          <BlogList loggedInUser={loggedInUser}/>
+        </div>
+      }/>
+
+      <Route path="/users" element={<Users />} />
+    </Routes>
     </div>
   )
 }

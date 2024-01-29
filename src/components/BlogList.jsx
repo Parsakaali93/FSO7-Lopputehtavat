@@ -1,4 +1,6 @@
 import blogService from '../services/blogs.js'
+import usersService from '../services/users.js'
+
 import { useState, useEffect, useRef } from 'react'
 import Togglable from './Togglable.jsx'
 import AddBlogForm from './AddBlogForm.jsx'
@@ -7,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { addBlog, setBlogs, changeBlog, removeBlog } from '../reducers/blogReducer.js'
 import { showNotification } from '../reducers/notificationReducer.js'
 const BlogList = ({loggedInUser}) => {
+    console.log("Component rendering");
     //const [blogs, setBlogs] = useState([])
     const blogs = [...useSelector(state => state.blogs)]
 
@@ -14,14 +17,15 @@ const BlogList = ({loggedInUser}) => {
     const dispatch = useDispatch()
 
     useEffect(() => {
-      const config = { headers: { Authorization: blogService.token }, }
-      //console.log(config)
-  
-      if(blogService.token){
-        blogService.getAllForUser(config).then(blogs => {
-          dispatch(setBlogs(blogs))
-        }
-      )}},  [blogService.token])
+      console.log("serv", usersService)
+      if(usersService.getToken()){
+        console.log("ustoken", usersService.getToken())
+
+        usersService.getAllOfUsersBlogs()
+        .then(blogs => {dispatch(setBlogs(blogs))})
+        .catch(exception => {console.log("exception in useEffect to fetch all blogs of a user", exception)})
+      }
+    },  [usersService.getToken()])
 
 
       const updateBlog = async(blog) => {
@@ -77,6 +81,7 @@ const BlogList = ({loggedInUser}) => {
 
     return (
         <div>
+          
         {loggedInUser && <Togglable buttonLabel="Add New Blog" ref={addBlogFormRef}>
             <AddBlogForm submitBlog={submitBlog}/>
         </Togglable>}

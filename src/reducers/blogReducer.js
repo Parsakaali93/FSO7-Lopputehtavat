@@ -31,15 +31,5 @@ const blogSlice = createSlice({
     }
 })
 
-// export const showNotification = (text, color, time) => {
-//   return async dispatch => {
-//      dispatch(setNotificiation({text: text, color: color, display: true}))
-     
-//      setTimeout(() => {
-//       dispatch(setNotificiation({text: text, color: color, display: false}))
-//     }, time * 1000)
-//  }
-// }
-
   export const { addBlog, setBlogs, changeBlog, removeBlog } = blogSlice.actions
   export default blogSlice.reducer

@@ -8,6 +8,7 @@ const getAll = () => {
 }
 
 const getAllForUser = (user) => {
+  console.log("getAllForUser", user)
   const request = axios.get(baseUrl, user)
   return request.then(response => response.data)
 }
