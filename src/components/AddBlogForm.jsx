@@ -18,7 +18,8 @@ const AddBlogForm = (props) => {
     let newBlog = {
       title: blogName,
       author: blogAuthor,
-      url: blogUrl
+      url: blogUrl,
+      comments: []
     }
 
     props.submitBlog(newBlog)

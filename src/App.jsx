@@ -7,12 +7,15 @@ import Notification from './components/Notification'
 import { useDispatch, useSelector } from 'react-redux'
 import BlogList from './components/BlogList'
 import { setUser } from './reducers/loginReducer'
+import { setBlogs } from './reducers/blogReducer'
 
 import {
   BrowserRouter as Router,  Routes, Route, Link
 } from 'react-router-dom'
 import Users from './components/Users'
 import SingleUserPage from './components/SingleUserPage'
+import SingleBlogPage from './components/SingleBlogPage'
+
 import blogs from './services/blogs'
 
 const App = () => {
@@ -29,6 +32,7 @@ const App = () => {
   const [users, setUsers] = useState([])
 
   console.log("App render")
+
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedInUser')
     if (loggedUserJSON) {
@@ -63,10 +67,27 @@ const App = () => {
         }
       }
 
-      fetchAllUsers();
+      const fetchAllBlogs = async () => {
+        try {
+
+          const allBlogs = await blogService.getAll()
+        //   for(let i = 0; i < allUsers.length; i++)
+        //   {
+        //     //const b = await usersService.getAllOfUsersBlogs(allUsers[0].id)
+        //    // allUsers[i] = {...allUsers[i], blogs: b.length}
+        //   }
+
+          dispatch(setBlogs(allBlogs))
+
+        } catch (error) {
+          // Handle error if needed
+          console.error('Error fetching blogs:', error);
+        }
+      }
+
+      fetchAllBlogs()
+      fetchAllUsers()
   }, [])
-
-
 
   // Test user: Maukkis hunter3
   const handleLogin = async (event) => {
@@ -116,9 +137,9 @@ const App = () => {
   )
 
   const loggedInForm = () => (
-    <div>
-      <p>Logged in as {loggedInUser.username}</p>
-      <button onClick={logout}>LOGOUT</button>
+    <div className='loggedIn'>
+      <p>Logged in as {loggedInUser.username}<button className="logoutButton" onClick={logout}>LOGOUT</button></p>
+      
     </div>
   )
 
@@ -128,27 +149,28 @@ const App = () => {
 
   return (
     <div>
+      <nav>
       <Link style={padding} to="/">blogs</Link>
       <Link style={padding} to="/users">users</Link>
-      {!loggedInUser && loginForm()}
       {loggedInUser && loggedInForm()}
+      </nav>
+      {!loggedInUser && loginForm()}
+      <div  className='mainDiv' >
     <Routes>
       <Route path="/" element={
         <div>
-          
-          
-          <button onClick={test}>TEST</button>
-          
           <Notification isVisible={notificationVisible} color={notificationColor} message={notificationMessage}/>
           
-          <h2>blogs</h2>
+          <h1>Your Blogs</h1>
           <BlogList loggedInUser={loggedInUser}/>
         </div>
       }/>
 
       <Route path="/users" element={<Users users={users}/>} />
       <Route path="/users/:id" element={<SingleUserPage users={users}/>} />
+      <Route path="/blogs/:id" element={<SingleBlogPage />} />
     </Routes>
+    </div>
     </div>
   )
 }

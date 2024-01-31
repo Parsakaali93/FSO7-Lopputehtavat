@@ -1,3 +1,8 @@
+body{
+    margin:0 0 0 0;
+    padding:0;
+}
+
 .addBlog{
     margin: 50px 0;
 }
@@ -15,4 +20,24 @@
     align-items: center;
     justify-content: center;
     margin:25px;
+}
+
+nav {
+    background-color: #eeeeee;
+    height:50px;
+    display:flex;
+    align-items: center;
+    margin-bottom: 60px;
+}
+
+.logoutButton{
+    margin-left:10px;
+}
+
+.loggedIn{
+    margin-left: 50px;
+}
+
+.mainDiv{
+    margin-left: 20px;
 }
